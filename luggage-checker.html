@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>行李装载测算</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* 颜色变量 - 从 Figma 设计稿提取 */
+      --color-primary: #FFE033;
+      --color-primary-dark: #FFD233;
+      --color-text-primary: #0F131A;
+      --color-text-secondary: #919499;
+      --color-text-tertiary: #575A5F;
+      --color-success: #47B259;
+      --color-warning: #FFD233;
+      --color-error: #FF3B30;
+      --color-white: #FFFFFF;
+      --color-bg-card: #FFFFFF;
+      --color-bg-input: #F2F3F5;
+      --color-border: #E6E6E6;
+      --color-gradient-start: #EBEBFF;
+      --color-gradient-end: #F7F8FA;
+    }
+
+    body {
+      font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(180deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
+      min-height: 100vh;
+      max-width: 750px;
+      margin: 0 auto;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 背景装饰 */
+    .bg-decoration {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 924px;
+      height: 659px;
+      background: radial-gradient(ellipse at center, rgba(93, 113, 203, 0.15) 0%, transparent 70%);
+      filter: blur(57px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 页面容器 */
+    .page-container {
+      position: relative;
+      z-index: 1;
+      padding-bottom: 120px;
+    }
+
+    /* 顶部导航栏 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      padding-top: calc(env(safe-area-inset-top, 20px) + 16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .header-left svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .header-title {
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    .header-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .header-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Tab 切换导航 */
+    .tab-nav {
+      display: flex;
+      justify-content: center;
+      padding: 0 18px;
+      margin-bottom: 20px;
+    }
+
+    .tab-container {
+      display: flex;
+      background: var(--color-white);
+      border-radius: 36px;
+      padding: 6px;
+      gap: 6px;
+    }
+
+    .tab-item {
+      padding: 15px 24px;
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .tab-item.active {
+      background: var(--color-primary);
+      color: var(--color-text-primary);
+    }
+
+    .tab-item:not(.active):hover {
+      background: var(--color-bg-input);
+    }
+
+    /* 车辆后备箱展示区 */
+    .car-display {
+      margin: 0 18px;
+      position: relative;
+    }
+
+    .car-image-container {
+      background: var(--color-white);
+      border-radius: 24px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .car-image {
+      width: 100%;
+      height: 385px;
+      background: linear-gradient(180deg, #F8F9FA 0%, #E8EAED 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 车辆示意图 SVG */
+    .car-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 尺寸标注 */
+    .dimension-label {
+      position: absolute;
+      background: var(--color-text-primary);
+      color: var(--color-white);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .dimension-label.width-label {
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .dimension-label.height-label {
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .dimension-label.depth-label {
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* 标注线 */
+    .dimension-line {
+      position: absolute;
+      background: var(--color-text-primary);
+      opacity: 0.3;
+    }
+
+    .dimension-line.horizontal {
+      height: 1px;
+      width: 258px;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .dimension-line.vertical {
+      width: 1px;
+      height: 144px;
+      right: 100px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* 测算结果提示区 */
+    .result-section {
+      margin: 20px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .result-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .result-icon.success {
+      background: rgba(71, 178, 89, 0.1);
+    }
+
+    .result-icon.success svg {
+      color: var(--color-success);
+    }
+
+    .result-icon.warning {
+      background: rgba(255, 210, 51, 0.1);
+    }
+
+    .result-icon.warning svg {
+      color: var(--color-warning);
+    }
+
+    .result-icon.error {
+      background: rgba(255, 59, 48, 0.1);
+    }
+
+    .result-icon.error svg {
+      color: var(--color-error);
+    }
+
+    .result-text {
+      flex: 1;
+    }
+
+    .result-title {
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .result-desc {
+      font-size: 22px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* 底部卡片 */
+    .bottom-card {
+      margin: 0 18px;
+      background: var(--color-white);
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .card-title {
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 24px;
+      color: var(--color-text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* 行李选择器 */
+    .luggage-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .luggage-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px;
+      background: var(--color-bg-input);
+      border-radius: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .luggage-item.selected {
+      background: rgba(255, 224, 51, 0.2);
+      border: 2px solid var(--color-primary);
+    }
+
+    .luggage-image {
+      width: 80px;
+      height: 100px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .luggage-image svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .luggage-name {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+
+    .luggage-size {
+      font-size: 20px;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+    }
+
+    /* 数量选择器 */
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .qty-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: var(--color-white);
+      color: var(--color-text-primary);
+      font-size: 28px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .qty-btn:hover:not(:disabled) {
+      background: var(--color-primary);
+    }
+
+    .qty-btn:disabled {
+      color: var(--color-text-secondary);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .qty-value {
+      min-width: 40px;
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    /* 拍照识别引导条 */
+    .photo-guide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px;
+      background: var(--color-bg-input);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .photo-guide:hover {
+      background: rgba(255, 224, 51, 0.2);
+    }
+
+    .photo-guide-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo-guide-icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--color-text-primary);
+    }
+
+    .photo-guide-text {
+      font-size: 24px;
+      color: var(--color-text-primary);
+    }
+
+    /* 底部提示 */
+    .bottom-tips {
+      margin: 20px 18px;
+      text-align: center;
+      font-size: 20px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* 乘坐人数 Tab 内容 */
+    .passenger-content {
+      display: none;
+    }
+
+    .passenger-content.active {
+      display: block;
+    }
+
+    .luggage-content {
+      display: block;
+    }
+
+    .luggage-content.hidden {
+      display: none;
+    }
+
+    /* 乘客选择器 */
+    .passenger-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      background: var(--color-white);
+      border-radius: 24px;
+      margin: 0 18px;
+    }
+
+    .passenger-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--color-bg-input);
+      border-radius: 16px;
+    }
+
+    .passenger-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .passenger-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .passenger-icon svg {
+      width: 32px;
+      height: 32px;
+      color: var(--color-text-primary);
+    }
+
+    .passenger-label {
+      font-size: 28px;
+      color: var(--color-text-primary);
+    }
+
+    /* 响应式适配 */
+    @media screen and (max-width: 375px) {
+      .header-title {
+        font-size: 32px;
+      }
+
+      .tab-item {
+        font-size: 24px;
+        padding: 12px 20px;
+      }
+
+      .luggage-item {
+        padding: 12px 8px;
+      }
+
+      .luggage-name {
+        font-size: 22px;
+      }
+
+      .luggage-size {
+        font-size: 18px;
+      }
+    }
+
+    @media screen and (min-width: 750px) {
+      body {
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 背景装饰 -->
+  <div class="bg-decoration"></div>
+
+  <div class="page-container">
+    <!-- 顶部导航栏 -->
+    <header class="header">
+      <div class="header-left" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </div>
+      <h1 class="header-title">行李装载测算</h1>
+      <div class="header-right">
+        <div class="header-btn" onclick="closePage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab 切换导航 -->
+    <nav class="tab-nav">
+      <div class="tab-container">
+        <div class="tab-item active" data-tab="luggage" onclick="switchTab('luggage')">行李空间</div>
+        <div class="tab-item" data-tab="passenger" onclick="switchTab('passenger')">乘坐人数</div>
+      </div>
+    </nav>
+
+    <!-- 行李空间 Tab 内容 -->
+    <div class="luggage-content" id="luggage-content">
+      <!-- 车辆后备箱展示区 -->
+      <div class="car-display">
+        <div class="car-image-container">
+          <div class="car-image">
+            <!-- 车辆后备箱示意图 -->
+            <svg class="car-svg" viewBox="0 0 677 385" fill="none">
+              <!-- 后备箱轮廓 -->
+              <rect x="50" y="50" width="577" height="285" rx="20" fill="#E8EAED" stroke="#D2D4D9" stroke-width="2"/>
+
+              <!-- 后排座椅 -->
+              <rect x="50" y="50" width="577" height="80" rx="20" fill="#D2D4D9"/>
+              <text x="338" y="95" text-anchor="middle" fill="#575A5F" font-size="20">后排座椅</text>
+
+              <!-- 行李区域 -->
+              <rect x="70" y="150" width="537" height="165" rx="10" fill="#F2F3F5" stroke="#D2D4D9" stroke-width="1" stroke-dasharray="8 4"/>
+              <text x="338" y="240" text-anchor="middle" fill="#919499" font-size="18">行李放置区域</text>
+
+              <!-- 左侧轮拱 -->
+              <ellipse cx="100" cy="300" rx="40" ry="25" fill="#C4C7CC"/>
+              <!-- 右侧轮拱 -->
+              <ellipse cx="577" cy="300" rx="40" ry="25" fill="#C4C7CC"/>
+            </svg>
+
+            <!-- 尺寸标注 -->
+            <div class="dimension-label width-label">180cm</div>
+            <div class="dimension-label height-label">46cm</div>
+            <div class="dimension-label depth-label">126cm</div>
+
+            <!-- 标注线 -->
+            <div class="dimension-line horizontal"></div>
+            <div class="dimension-line vertical"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 测算结果提示区 -->
+      <div class="result-section" id="result-section">
+        <div class="result-icon success" id="result-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div class="result-text">
+          <div class="result-title" id="result-title">空间充足，推荐5座车型</div>
+          <div class="result-desc" id="result-desc">预计剩余空间约 120L，可轻松容纳您的行李</div>
+        </div>
+      </div>
+
+      <!-- 底部卡片 -->
+      <div class="bottom-card">
+        <h2 class="card-title">选择行李尺寸</h2>
+        <p class="card-subtitle">请选择您要携带的行李箱数量</p>
+
+        <!-- 行李选择器 -->
+        <div class="luggage-selector">
+          <!-- 20寸行李箱 -->
+          <div class="luggage-item" id="luggage-20">
+            <div class="luggage-image">
+              <svg viewBox="0 0 80 100" fill="none">
+                <rect x="8" y="15" width="64" height="80" rx="8" fill="#D2D4D9" stroke="#919499" stroke-width="2"/>
+                <rect x="28" y="5" width="24" height="12" rx="4" fill="#919499"/>
+                <rect x="15" y="25" width="50" height="60" rx="4" fill="#E6E6E6"/>
+                <circle cx="40" cy="85" r="4" fill="#919499"/>
+              </svg>
+            </div>
+            <div class="luggage-name">20寸</div>
+            <div class="luggage-size">34×50×20cm</div>
+            <div class="quantity-selector">
+              <button class="qty-btn" onclick="changeQuantity('20', -1)" id="btn-20-minus">−</button>
+              <span class="qty-value" id="qty-20">0</span>
+              <button class="qty-btn" onclick="changeQuantity('20', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- 24寸行李箱 -->
+          <div class="luggage-item" id="luggage-24">
+            <div class="luggage-image">
+              <svg viewBox="0 0 80 100" fill="none">
+                <rect x="5" y="12" width="70" height="85" rx="8" fill="#B8BCC2" stroke="#7A7F86" stroke-width="2"/>
+                <rect x="26" y="3" width="28" height="12" rx="4" fill="#7A7F86"/>
+                <rect x="12" y="22" width="56" height="65" rx="4" fill="#D2D4D9"/>
+                <circle cx="40" cy="88" r="4" fill="#7A7F86"/>
+              </svg>
+            </div>
+            <div class="luggage-name">24寸</div>
+            <div class="luggage-size">42×68×26cm</div>
+            <div class="quantity-selector">
+              <button class="qty-btn" onclick="changeQuantity('24', -1)" id="btn-24-minus">−</button>
+              <span class="qty-value" id="qty-24">0</span>
+              <button class="qty-btn" onclick="changeQuantity('24', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- 28寸行李箱 -->
+          <div class="luggage-item" id="luggage-28">
+            <div class="luggage-image">
+              <svg viewBox="0 0 80 100" fill="none">
+                <rect x="2" y="8" width="76" height="90" rx="10" fill="#919499" stroke="#575A5F" stroke-width="2"/>
+                <rect x="24" y="0" width="32" height="10" rx="4" fill="#575A5F"/>
+                <rect x="10" y="18" width="60" height="70" rx="6" fill="#B8BCC2"/>
+                <circle cx="40" cy="88" r="5" fill="#575A5F"/>
+              </svg>
+            </div>
+            <div class="luggage-name">28寸</div>
+            <div class="luggage-size">52×77×29cm</div>
+            <div class="quantity-selector">
+              <button class="qty-btn" onclick="changeQuantity('28', -1)" id="btn-28-minus">−</button>
+              <span class="qty-value" id="qty-28">0</span>
+              <button class="qty-btn" onclick="changeQuantity('28', 1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 拍照识别引导条 -->
+        <div class="photo-guide" onclick="openCamera()">
+          <div class="photo-guide-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M16 5V3"/>
+            </svg>
+          </div>
+          <span class="photo-guide-text">不知道行李尺寸？AI拍照识别</span>
+        </div>
+      </div>
+
+      <!-- 底部提示 -->
+      <p class="bottom-tips">计算结果依赖AI提供的后备箱数据，最终结果以实际服务车辆为准</p>
+    </div>
+
+    <!-- 乘坐人数 Tab 内容 -->
+    <div class="passenger-content" id="passenger-content">
+      <div class="passenger-selector">
+        <div class="passenger-item">
+          <div class="passenger-info">
+            <div class="passenger-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+              </svg>
+            </div>
+            <span class="passenger-label">成人</span>
+          </div>
+          <div class="quantity-selector">
+            <button class="qty-btn" onclick="changePassenger('adult', -1)">−</button>
+            <span class="qty-value" id="qty-adult">1</span>
+            <button class="qty-btn" onclick="changePassenger('adult', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="passenger-item">
+          <div class="passenger-info">
+            <div class="passenger-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="7" r="3"/>
+                <path d="M6 18c0-3 3-5 6-5s6 2 6 5"/>
+              </svg>
+            </div>
+            <span class="passenger-label">儿童</span>
+          </div>
+          <div class="quantity-selector">
+            <button class="qty-btn" onclick="changePassenger('child', -1)">−</button>
+            <span class="qty-value" id="qty-child">0</span>
+            <button class="qty-btn" onclick="changePassenger('child', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="passenger-item">
+          <div class="passenger-info">
+            <div class="passenger-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="9" r="2"/>
+                <path d="M8 17c0-2 2-3 4-3s4 1 4 3"/>
+              </svg>
+            </div>
+            <span class="passenger-label">婴儿</span>
+          </div>
+          <div class="quantity-selector">
+            <button class="qty-btn" onclick="changePassenger('infant', -1)">−</button>
+            <span class="qty-value" id="qty-infant">0</span>
+            <button class="qty-btn" onclick="changePassenger('infant', 1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 行李数据
+    const luggageData = {
+      '20': { name: '20寸', volume: 34, size: '34×50×20cm' },
+      '24': { name: '24寸', volume: 74, size: '42×68×26cm' },
+      '28': { name: '28寸', volume: 116, size: '52×77×29cm' }
+    };
+
+    // 后备箱容量（5座车型，单位：升）
+    const trunkCapacity = {
+      '5seat': 400,
+      '7seat': 500
+    };
+
+    // 当前行李数量
+    const quantities = {
+      '20': 0,
+      '24': 0,
+      '28': 0
+    };
+
+    // 乘客数量
+    const passengers = {
+      adult: 1,
+      child: 0,
+      infant: 0
+    };
+
+    // 切换 Tab
+    function switchTab(tab) {
+      const tabs = document.querySelectorAll('.tab-item');
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+      if (tab === 'luggage') {
+        document.getElementById('luggage-content').classList.remove('hidden');
+        document.getElementById('luggage-content').classList.add('active');
+        document.getElementById('passenger-content').classList.remove('active');
+      } else {
+        document.getElementById('luggage-content').classList.add('hidden');
+        document.getElementById('luggage-content').classList.remove('active');
+        document.getElementById('passenger-content').classList.add('active');
+      }
+    }
+
+    // 改变行李数量
+    function changeQuantity(size, delta) {
+      const newQty = Math.max(0, quantities[size] + delta);
+      quantities[size] = newQty;
+      document.getElementById(`qty-${size}`).textContent = newQty;
+
+      // 更新减号按钮状态
+      const minusBtn = document.getElementById(`btn-${size}-minus`);
+      minusBtn.disabled = newQty === 0;
+
+      // 更新选中状态
+      const item = document.getElementById(`luggage-${size}`);
+      if (newQty > 0) {
+        item.classList.add('selected');
+      } else {
+        item.classList.remove('selected');
+      }
+
+      // 计算并更新结果
+      calculateResult();
+    }
+
+    // 改变乘客数量
+    function changePassenger(type, delta) {
+      const min = type === 'adult' ? 1 : 0;
+      const newQty = Math.max(min, Math.min(6, passengers[type] + delta));
+      passengers[type] = newQty;
+      document.getElementById(`qty-${type}`).textContent = newQty;
+    }
+
+    // 计算结果
+    function calculateResult() {
+      let totalVolume = 0;
+      for (const [size, qty] of Object.entries(quantities)) {
+        totalVolume += luggageData[size].volume * qty;
+      }
+
+      const resultIcon = document.getElementById('result-icon');
+      const resultTitle = document.getElementById('result-title');
+      const resultDesc = document.getElementById('result-desc');
+
+      if (totalVolume === 0) {
+        resultIcon.className = 'result-icon success';
+        resultIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+        resultTitle.textContent = '请选择您的行李';
+        resultDesc.textContent = '选择行李数量后将自动计算空间是否充足';
+        return;
+      }
+
+      const remaining = trunkCapacity['5seat'] - totalVolume;
+
+      if (remaining >= 150) {
+        // 空间充足
+        resultIcon.className = 'result-icon success';
+        resultIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+        resultTitle.textContent = '空间充足，推荐5座车型';
+        resultDesc.textContent = `预计剩余空间约 ${remaining}L，可轻松容纳您的行李`;
+      } else if (remaining >= 50) {
+        // 空间紧张
+        resultIcon.className = 'result-icon warning';
+        resultIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        resultTitle.textContent = '空间适中，建议7座车型';
+        resultDesc.textContent = `预计剩余空间约 ${remaining}L，升级7座更舒适`;
+      } else {
+        // 空间不足
+        resultIcon.className = 'result-icon error';
+        resultIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        resultTitle.textContent = '5座车型较难容纳，建议升级7座';
+        resultDesc.textContent = `超出约 ${Math.abs(remaining)}L，7座空间更大更合适`;
+      }
+    }
+
+    // 返回
+    function goBack() {
+      alert('返回上一页');
+    }
+
+    // 关闭
+    function closePage() {
+      alert('关闭页面');
+    }
+
+    // 打开相机
+    function openCamera() {
+      alert('打开AI拍照识别功能');
+    }
+
+    // 初始化减号按钮状态
+    document.addEventListener('DOMContentLoaded', () => {
+      ['20', '24', '28'].forEach(size => {
+        document.getElementById(`btn-${size}-minus`).disabled = true;
+      });
+    });
+  </script>
+</body>
+</html>
