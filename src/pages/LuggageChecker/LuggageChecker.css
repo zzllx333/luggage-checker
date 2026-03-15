@@ -1,0 +1,563 @@
+/* 移动端设计稿尺寸 750 x 1624px */
+.luggage-checker {
+  width: 750px;
+  height: 1624px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: #1a1a2e;
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Background Gradient */
+.background-gradient {
+  position: absolute;
+  top: 239px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #EBEBFF 0%, #F7F8FA 53%);
+  border-radius: 48px 48px 0 0;
+}
+
+/* Header */
+.header {
+  position: absolute;
+  top: 40px;
+  right: 48px;
+  z-index: 10;
+}
+
+.close-btn {
+  width: 96px;
+  height: 96px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-btn svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Tab Navigation */
+.tab-container {
+  position: absolute;
+  top: 263px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: #fff;
+  border-radius: 38px;
+  padding: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #919499;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.tab-item.active {
+  background: #FFE033;
+  color: #0F131A;
+}
+
+.tab-item svg,
+.tab-item img {
+  width: 18px;
+  height: 18px;
+}
+
+.tab-item span {
+  white-space: nowrap;
+}
+
+/* Car Info Label */
+.car-info-label {
+  position: absolute;
+  top: 389px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  color: #0F131A;
+  opacity: 0.4;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* Car Image Section */
+.car-image-section {
+  position: absolute;
+  top: 447px;
+  left: 0;
+  right: 0;
+  height: 385px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 36px;
+  z-index: 10;
+}
+
+.car-image-container {
+  position: relative;
+  width: 677px;
+  height: 385px;
+}
+
+.car-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Dimension Labels */
+.dimension-label {
+  position: absolute;
+  font-size: 22px;
+  color: rgba(47, 217, 243, 0.9);
+  text-shadow: 0 0 12px #2FD9F3;
+  text-align: center;
+  z-index: 20;
+}
+
+.dimension-top {
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dimension-middle {
+  top: 130px;
+  left: 32%;
+}
+
+.dimension-bottom {
+  top: 210px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.outline-line {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 15;
+}
+
+.outline-1 {
+  top: 44px;
+  right: 55px;
+  width: 155px;
+  height: auto;
+}
+
+.outline-2 {
+  top: 43px;
+  right: 50px;
+  width: 160px;
+  height: auto;
+  opacity: 1;
+}
+
+/* Status Results */
+.status-results {
+  position: absolute;
+  top: 749px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  background: linear-gradient(90deg, #F2FEFF 0%, #FFFFFF 100%);
+  border: 2px solid #fff;
+  border-radius: 24px;
+  padding: 24px 48px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  z-index: 10;
+  width: max-content;
+  max-width: calc(100% - 72px);
+}
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  color: #0F131A;
+  white-space: nowrap;
+}
+
+.status-sub {
+  font-size: 22px;
+  color: #919499;
+  white-space: nowrap;
+}
+
+/* Luggage Card */
+.luggage-card {
+  position: absolute;
+  top: 886px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 714px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 48px 48px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.card-title {
+  font-size: 30px;
+  font-weight: 500;
+  color: #0F131A;
+  margin: 0 0 36px;
+}
+
+/* Luggage Selector */
+.luggage-selector {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.luggage-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.luggage-image-container {
+  width: 190px;
+  height: 187px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.luggage-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.luggage-size {
+  font-size: 20px;
+  color: #919499;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 190px;
+  height: 54px;
+  background: #F7F8FA;
+  border-radius: 27px;
+  padding: 0 12px;
+}
+
+.counter-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.counter-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.counter-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.counter-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #0F131A;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Photo Feature */
+.photo-feature {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 36px;
+  background: linear-gradient(90.97deg, #F5F5FF 6.41%, #FFFFFF 109.13%);
+  border-radius: 24px;
+  cursor: pointer;
+}
+
+.photo-feature-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.photo-feature-left svg {
+  width: 30px;
+  height: 30px;
+}
+
+.photo-feature-text {
+  font-size: 24px;
+  color: #0F131A;
+  white-space: nowrap;
+}
+
+/* Footer Notice */
+.footer-notice {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 0 48px;
+  z-index: 10;
+}
+
+/* Home Indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 268px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  z-index: 10;
+}
+
+/* 响应式 - 适配实际手机屏幕 */
+@media screen and (max-width: 750px) {
+  .luggage-checker {
+    width: 100vw;
+    height: 100vh;
+    min-height: 667px;
+  }
+
+  .background-gradient {
+    top: 20vh;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .header {
+    top: 20px;
+    right: 20px;
+  }
+
+  .close-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .close-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-container {
+    top: calc(20vh + 20px);
+    border-radius: 24px;
+    padding: 4px;
+  }
+
+  .tab-item {
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 14px;
+    gap: 4px;
+  }
+
+  .tab-item svg,
+  .tab-item img {
+    width: 12px;
+    height: 12px;
+  }
+
+  .car-info-label {
+    top: calc(20vh + 100px);
+    font-size: 14px;
+  }
+
+  .car-image-section {
+    top: calc(20vh + 130px);
+    height: 200px;
+    padding: 0 16px;
+  }
+
+  .car-image-container {
+    width: 100%;
+    max-width: 340px;
+    height: 180px;
+  }
+
+  .dimension-label {
+    font-size: 14px;
+  }
+
+  .dimension-top {
+    top: 30px;
+  }
+
+  .dimension-middle {
+    top: 60px;
+  }
+
+  .dimension-bottom {
+    top: 100px;
+  }
+
+  .outline-1 {
+    top: 22px;
+    right: 28px;
+    width: 78px;
+  }
+
+  .outline-2 {
+    top: 21px;
+    right: 25px;
+    width: 80px;
+  }
+
+  .status-results {
+    top: calc(20vh + 340px);
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    max-width: calc(100% - 32px);
+  }
+
+  .status-main {
+    font-size: 14px;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .status-sub {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .luggage-card {
+    top: calc(20vh + 420px);
+    width: calc(100% - 32px);
+    padding: 16px 20px 24px;
+    border-radius: 12px;
+  }
+
+  .card-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .luggage-selector {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .luggage-item {
+    gap: 8px;
+  }
+
+  .luggage-image-container {
+    width: 100%;
+    height: 70px;
+  }
+
+  .luggage-size {
+    font-size: 10px;
+  }
+
+  .counter {
+    width: 100%;
+    height: 32px;
+    border-radius: 16px;
+    padding: 0 4px;
+  }
+
+  .counter-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .counter-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .counter-value {
+    font-size: 16px;
+    min-width: 30px;
+  }
+
+  .photo-feature {
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+
+  .photo-feature-left {
+    gap: 8px;
+  }
+
+  .photo-feature-left svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .photo-feature-text {
+    font-size: 14px;
+  }
+
+  .footer-notice {
+    bottom: 60px;
+    font-size: 12px;
+    padding: 0 24px;
+  }
+
+  .home-indicator {
+    width: 134px;
+    height: 5px;
+    bottom: 8px;
+  }
+}
