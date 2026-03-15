@@ -48,11 +48,11 @@ const HelpIcon = () => (
 );
 
 const LuggageIcon = () => (
-  <img src="https://gw.alicdn.com/imgextra/i1/O1CN01cSdG8J24YAo4HySn5_!!6000000007402-2-tps-36-36.png" alt="行李空间" width="18" height="18" />
+  <img src="https://gw.alicdn.com/imgextra/i1/O1CN01cSdG8J24YAo4HySn5_!!6000000007402-2-tps-36-36.png" alt="行李空间" width="36" height="36" />
 );
 
 const CarIcon = () => (
-  <img src="https://gw.alicdn.com/imgextra/i4/O1CN01xf4wrF1xYRjTOSm0q_!!6000000006455-2-tps-35-36.png" alt="车辆" width="18" height="18" />
+  <img src="https://gw.alicdn.com/imgextra/i4/O1CN01xf4wrF1xYRjTOSm0q_!!6000000006455-2-tps-35-36.png" alt="车辆" width="35" height="36" />
 );
 
 function LuggageChecker() {
@@ -107,24 +107,9 @@ function LuggageChecker() {
       <div className="car-image-section">
         <div className="car-image-container">
           <img
-            src="https://www.figma.com/api/mcp/asset/f6410ecd-dfbf-4e33-affa-5568e3a030b0"
+            src="https://gw.alicdn.com/imgextra/i2/O1CN01dQuxTn1mX6npB4T1y_!!6000000004963-2-tps-677-385.png"
             alt="车辆"
             className="car-image"
-          />
-          {/* Dimension Labels */}
-          <div className="dimension-label dimension-top">180cm</div>
-          <div className="dimension-label dimension-middle">46cm</div>
-          <div className="dimension-label dimension-bottom">126cm</div>
-          {/* Outline overlays */}
-          <img
-            src="https://www.figma.com/api/mcp/asset/65897d86-65c2-4b7a-87fb-524fbef7335d"
-            alt=""
-            className="outline-line outline-1"
-          />
-          <img
-            src="https://www.figma.com/api/mcp/asset/0e82773a-1488-495d-8782-14a5dd731035"
-            alt=""
-            className="outline-line outline-2"
           />
         </div>
       </div>
