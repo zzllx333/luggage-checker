@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Read(//Users/zihui/Desktop/行李图/**)"
     ]
   }
 }

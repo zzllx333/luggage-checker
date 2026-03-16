@@ -10,7 +10,7 @@ const MinusIcon = ({ disabled }) => (
   <img
     src={disabled
       ? "https://gw.alicdn.com/imgextra/i3/O1CN012017Iz1gtebVl3opB_!!6000000004200-2-tps-84-84.png"
-      : "https://gw.alicdn.com/imgextra/i3/O1CN01OfDnXd1y38Gj8UPQl_!!6000000006522-2-tps-84-84.png"
+      : "https://gw.alicdn.com/imgextra/i4/O1CN01DtDt0P1PJby3O38b8_!!6000000001820-2-tps-84-84.png"
     }
     alt=""
     width="21"
@@ -28,7 +28,7 @@ const PlusIcon = () => (
 );
 
 const ArrowRightIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M18 12L30 24L18 36" stroke="#919499" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
@@ -111,7 +111,7 @@ function LuggageChecker() {
   };
 
   // 计算行李总体积和状态
-  const { status, statusText, suggestion } = useMemo(() => {
+  const { status, statusText, suggestion, isEmpty } = useMemo(() => {
     const volume =
       luggage20 * LUGGAGE_VOLUME.size20 +
       luggage24 * LUGGAGE_VOLUME.size24 +
@@ -120,8 +120,9 @@ function LuggageChecker() {
     const ratio = volume / TRUNK_CAPACITY;
 
     let status, statusText, suggestion;
+    const isEmpty = luggage20 === 0 && luggage24 === 0 && luggage28 === 0;
 
-    if (luggage20 === 0 && luggage24 === 0 && luggage28 === 0) {
+    if (isEmpty) {
       // 未选择行李
       status = STATUS.OK;
       statusText = '后备箱正常可容纳 2件24寸行李箱';
@@ -143,7 +144,7 @@ function LuggageChecker() {
       suggestion = `超出约${Math.round(volume - TRUNK_CAPACITY)}升，无法装下`;
     }
 
-    return { totalVolume: volume, status, statusText, suggestion };
+    return { totalVolume: volume, status, statusText, suggestion, isEmpty };
   }, [luggage20, luggage24, luggage28]);
 
   // 根据状态获取图标
@@ -208,7 +209,15 @@ function LuggageChecker() {
       <div className="car-image-section">
         <div className="car-image-container">
           <img
-            src="https://gw.alicdn.com/imgextra/i2/O1CN01dQuxTn1mX6npB4T1y_!!6000000004963-2-tps-677-385.png"
+            src={
+              isEmpty
+                ? "https://gw.alicdn.com/imgextra/i2/O1CN01dQuxTn1mX6npB4T1y_!!6000000004963-2-tps-677-385.png"
+                : status === STATUS.ERROR
+                  ? "https://gw.alicdn.com/imgextra/i3/O1CN013Xgink1wXF4kX1xNt_!!6000000006317-2-tps-677-385.png"
+                  : status === STATUS.WARNING
+                    ? "https://gw.alicdn.com/imgextra/i2/O1CN01FTdm611wI80Ntk2kl_!!6000000006284-2-tps-677-385.png"
+                    : "https://gw.alicdn.com/imgextra/i2/O1CN01hLhQRF1izj5S8mgQG_!!6000000004484-2-tps-677-385.png"
+            }
             alt="车辆"
             className="car-image"
           />
@@ -229,7 +238,12 @@ function LuggageChecker() {
 
       {/* Luggage Selector Card */}
       <div className="luggage-card">
-        <h2 className="card-title">选择行李，估算是否能装下</h2>
+        <h2 className="card-title">
+          {luggage20 + luggage24 + luggage28 === 0
+            ? '选择行李，估算是否能装下'
+            : `已选 ${luggage20 + luggage24 + luggage28}件行李`
+          }
+        </h2>
 
         <div className="luggage-selector">
           {/* 20 inch */}

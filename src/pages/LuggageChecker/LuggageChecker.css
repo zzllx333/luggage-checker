@@ -218,6 +218,16 @@
 .status-results.status-error {
   background: linear-gradient(90deg, #FFEBE9 0%, #FFFFFF 100%);
   border-color: #FF3B30;
+  animation: breathing 1.5s ease-in-out infinite;
+}
+
+@keyframes breathing {
+  0%, 100% {
+    border-color: rgba(255, 59, 48, 1);
+  }
+  50% {
+    border-color: rgba(255, 59, 48, 0.3);
+  }
 }
 
 .status-text {
