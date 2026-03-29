@@ -8,6 +8,19 @@
   font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* 禁用移动端点击高亮 */
+.luggage-checker * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+.luggage-checker button,
+.luggage-checker .tab-item,
+.luggage-checker .photo-feature {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
 /* Background Gradient - 设计稿 top: 239px, h: 1385px */
 .background-gradient {
   position: absolute;
@@ -91,7 +104,7 @@
 /* Car Info Label - 设计稿 top: 389px, font: 22px */
 .car-info-label {
   position: absolute;
-  top: 195px;
+  top: 186px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 11px;
@@ -104,7 +117,7 @@
 /* Car Image Section - 设计稿 top: 447px, w: 677px, h: 385px, left: 36px */
 .car-image-section {
   position: absolute;
-  top: 224px;
+  top: 215px;
   left: 0;
   right: 0;
   height: 192px;
@@ -138,6 +151,8 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  /* 图片切换动效 */
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Dimension Labels - 设计稿 font: 22px */
@@ -192,36 +207,96 @@
 /* Status Results - 设计稿 top: 749px, left: 134px, padding: 12px 24px, rounded: 12px */
 .status-results {
   position: absolute;
-  top: 375px;
+  top: 366px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: flex-start;
   gap: 6px;
   background: linear-gradient(90deg, #F2FEFF 0%, #FFFFFF 100%);
-  border: 1px solid #86C992;
+  border: 1px solid #ffffff;
   border-radius: 6px;
   padding: 6px 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   z-index: 10;
   width: max-content;
   max-width: calc(100% - 36px);
+  /* 状态过渡动效 */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 状态图标动画 */
+.status-results .check-icon {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* 状态切换时图标弹跳效果 */
+.status-results.status-changing .check-icon {
+  animation: iconBounce 0.5s ease;
+}
+
+/* 状态切换时整体缩放效果 */
+.status-results.status-changing {
+  animation: statusPulse 0.4s ease;
+}
+
+@keyframes statusPulse {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.02); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes iconBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* 文字淡入效果 */
+.status-main span,
+.status-sub {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.status-results.status-changing .status-main span,
+.status-results.status-changing .status-sub {
+  animation: textFadeIn 0.4s ease;
+}
+
+@keyframes textFadeIn {
+  0% { opacity: 0; transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* 警告状态 - 橙色背景 */
 .status-results.status-warning {
   background: linear-gradient(90deg, #FFF8E6 0%, #FFFFFF 100%);
-  border-color: #FF9500;
+  border: 1px solid #FF9500;
+  box-shadow: 0 2px 10px rgba(255, 149, 0, 0.15);
+  animation: breathing-warning 1.5s ease-in-out infinite;
 }
 
 /* 错误状态 - 红色背景 */
 .status-results.status-error {
   background: linear-gradient(90deg, #FFEBE9 0%, #FFFFFF 100%);
-  border-color: #FF3B30;
-  animation: breathing 1.5s ease-in-out infinite;
+  border: 1px solid #FF3B30;
+  box-shadow: 0 2px 10px rgba(255, 59, 48, 0.15);
+  animation: breathing-error 1.5s ease-in-out infinite;
 }
 
-@keyframes breathing {
+@keyframes breathing-warning {
+  0%, 100% {
+    border-color: rgba(255, 149, 0, 1);
+  }
+  50% {
+    border-color: rgba(255, 149, 0, 0.3);
+  }
+}
+
+@keyframes breathing-error {
   0%, 100% {
     border-color: rgba(255, 59, 48, 1);
   }
@@ -264,10 +339,10 @@
   height: 13px;
 }
 
-/* Luggage Card - 设计稿 top: 886px, w: 714px, padding: 18px 24px 24px, rounded: 12px */
+/* Luggage Card - 设计稿 w:714px, padding:18px 24px 24px, gap:18px, rounded:12px */
 .luggage-card {
   position: absolute;
-  top: 443px;
+  top: 434px;
   left: 0;
   right: 0;
   background: #fff;
@@ -276,27 +351,29 @@
   margin: 0 9px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
 
-/* 卡片标题 - 设计稿 font: 30px, gap: 18px */
+/* 卡片标题 - 设计稿 font:30px */
 .card-title {
   font-size: 15px;
   font-weight: 500;
   color: #0F131A;
-  margin: 0 0 9px;
+  margin: 0;
 }
 
-/* Luggage Selector - 设计稿 w: 678px, gap: 12px */
+/* Luggage Selector - 设计稿 w:678px, justify:space-between */
 .luggage-selector {
   display: flex;
   justify-content: space-between;
-  gap: 6px;
-  margin-bottom: 9px;
+  margin: 0;
 }
 
-/* 行李项 - 设计稿 w: 190px, gap: 12px */
+/* 行李项 - 设计稿 w:190px, gap:12px */
 .luggage-item {
-  flex: 1;
+  width: 95px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -306,7 +383,7 @@
 /* 行李图片 - 设计稿 190x187px */
 .luggage-image-container {
   width: 95px;
-  height: 94px;
+  height: 93.5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,7 +395,7 @@
   object-fit: contain;
 }
 
-/* 行李尺寸文字 - 设计稿 font: 20px */
+/* 行李尺寸文字 - 设计稿 font:20px */
 .luggage-size {
   font-size: 10px;
   color: #919499;
@@ -326,7 +403,7 @@
   white-space: nowrap;
 }
 
-/* 计数器 - 设计稿 w: 190px, h: 54px, rounded: 26px, padding: 6px */
+/* 计数器 - 设计稿 w:190px, h:54px, rounded:26px, padding:6px */
 .counter {
   display: flex;
   align-items: center;
@@ -348,10 +425,19 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.counter-btn:active {
+  transform: scale(0.85);
 }
 
 .counter-btn.disabled {
   cursor: not-allowed;
+}
+
+.counter-btn.disabled:active {
+  transform: none;
 }
 
 .counter-btn:hover {
@@ -362,18 +448,30 @@
 .counter-btn img {
   width: 21px;
   height: 21px;
+  transition: transform 0.15s ease;
 }
 
-/* 计数器数值 - 设计稿 font: 28px */
+/* 计数器数值 - 设计稿 font:28px */
 .counter-value {
   font-size: 14px;
   font-weight: 600;
   color: #0F131A;
   min-width: 30px;
   text-align: center;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
-/* Photo Feature - 设计稿 h: 72px, padding: 18px, rounded: 12px */
+.counter-value.changing {
+  animation: valuePop 0.3s ease;
+}
+
+@keyframes valuePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); color: #FFE033; }
+  100% { transform: scale(1); }
+}
+
+/* Photo Feature - 设计稿 h:72px, padding:18px, rounded:12px */
 .photo-feature {
   display: flex;
   align-items: center;
@@ -397,7 +495,7 @@
   height: 15px;
 }
 
-/* 拍照识别文字 - 设计稿 font: 24px */
+/* 拍照识别文字 - 设计稿 font:24px */
 .photo-feature-text {
   font-size: 12px;
   color: #0F131A;
@@ -408,6 +506,122 @@
 .photo-feature .arrow-icon {
   width: 24px;
   height: 24px;
+}
+
+/* Photo Luggage Section - 左对齐布局 */
+.photo-luggage-section {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+/* 拍照识别行李项 - 设计稿 w:190px, gap:12px */
+.photo-luggage-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 32px;
+  width: 95px;
+  animation: photoItemEnter 0.3s ease-out;
+}
+
+/* 拍照识别行李入场动画 */
+@keyframes photoItemEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* photo 容器 - 设计稿 w:144px h:122px */
+.photo-luggage-photo {
+  position: relative;
+  width: 72px;
+  height: 61px;
+}
+
+/* image 展位图 - 设计稿 w:133px h:117px, left:6px, top:5px */
+.photo-luggage-photo .image-placeholder {
+  position: absolute;
+  left: 3px;
+  top: 2.5px;
+  width: 66.5px;
+  height: 58.5px;
+}
+
+.photo-luggage-photo .image-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* image-photo 小图 - 设计稿 56px, left:83px, top:66px, 圆角12px, 边框2px */
+.photo-luggage-photo .image-photo {
+  position: absolute;
+  left: 41.5px;
+  top: 33px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  object-fit: cover;
+  animation: thumbnailAppear 0.3s ease-out;
+}
+
+/* 缩略图入场动画 - 配合过渡效果 */
+@keyframes thumbnailAppear {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* icon-close 关闭按钮 - 设计稿 30px, left:130px, top:4px */
+.photo-luggage-photo .icon-close {
+  position: absolute;
+  left: 65px;
+  top: 2px;
+  width: 15px;
+  height: 15px;
+  opacity: 0.3;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.photo-luggage-photo .icon-close img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 尺寸文字 - 设计稿 font:20px */
+.photo-luggage-size {
+  font-size: 10px;
+  color: #919499;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 计数器 - 设计稿 w:190px, h:54px, rounded:26px */
+.photo-luggage-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95px;
+  height: 27px;
+  background: #F7F8FA;
+  border-radius: 13px;
+  padding: 0 3px;
 }
 
 /* Footer Notice - 设计稿 top: 1529px, font: 20px */

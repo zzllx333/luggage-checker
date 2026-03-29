@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './LuggageChecker.css';
 
 // Icons as SVG components - 设计稿尺寸除以2
@@ -97,10 +98,48 @@ const STATUS = {
 };
 
 function LuggageChecker() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [luggage20, setLuggage20] = useState(0);
   const [luggage24, setLuggage24] = useState(0);
   const [luggage28, setLuggage28] = useState(0);
   const [activeTab, setActiveTab] = useState('luggage');
+  const [photoLuggage, setPhotoLuggage] = useState(() => {
+    // 从 sessionStorage 恢复之前的数据
+    const saved = sessionStorage.getItem('photoLuggage');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [isStatusChanging, setIsStatusChanging] = useState(false);
+  const lastProcessedId = useRef(null);
+  const prevStatusRef = useRef(null);
+
+  // 保存 photoLuggage 到 sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('photoLuggage', JSON.stringify(photoLuggage));
+  }, [photoLuggage]);
+
+  // 接收拍照识别结果
+  useEffect(() => {
+    const photoData = location.state?.photoLuggage;
+    const photoId = location.state?.photoId;
+
+    if (photoData && photoData.image && photoId) {
+      // 使用拍照时生成的唯一ID，防止同一张照片重复添加
+      if (lastProcessedId.current !== photoId) {
+        lastProcessedId.current = photoId;
+
+        const newItem = {
+          ...photoData,
+          id: photoId,
+          count: 1
+        };
+        setPhotoLuggage(prev => [...prev, newItem]);
+
+        // 清除 location state
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const handleDecrement = (setter, value) => {
     if (value > 0) setter(value - 1);
@@ -110,27 +149,69 @@ function LuggageChecker() {
     setter(value + 1);
   };
 
+  // 跳转到拍照页面
+  const handlePhotoCapture = () => {
+    navigate('/luggage-checker/photo');
+  };
+
+  // 拍照行李计数器操作
+  const handlePhotoLuggageDecrement = (index) => {
+    setPhotoLuggage(prev => {
+      const updated = [...prev];
+      if (updated[index].count > 1) {
+        updated[index] = { ...updated[index], count: updated[index].count - 1 };
+      } else {
+        // count 为 0 时删除该项
+        updated.splice(index, 1);
+      }
+      return updated;
+    });
+  };
+
+  const handlePhotoLuggageIncrement = (index) => {
+    setPhotoLuggage(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], count: updated[index].count + 1 };
+      return updated;
+    });
+  };
+
   // 计算行李总体积和状态
   const { status, statusText, suggestion, isEmpty } = useMemo(() => {
+    // 计算拍照识别行李的体积（直接使用 AI 识别的体积）
+    const photoVolume = photoLuggage.reduce((total, item) => {
+      // 使用识别的体积（升），如果没有则使用尺寸计算
+      let volume = item.volume || 0;
+      if (!volume && item.dimensions) {
+        // 如果没有 volume，尝试从 dimensions 解析计算
+        const dims = item.dimensions.match(/(\d+)×(\d+)×(\d+)/);
+        if (dims) {
+          volume = (parseInt(dims[1]) * parseInt(dims[2]) * parseInt(dims[3])) / 1000;
+        }
+      }
+      return total + volume * (item.count || 1);
+    }, 0);
+
     const volume =
       luggage20 * LUGGAGE_VOLUME.size20 +
       luggage24 * LUGGAGE_VOLUME.size24 +
-      luggage28 * LUGGAGE_VOLUME.size28;
+      luggage28 * LUGGAGE_VOLUME.size28 +
+      photoVolume;
 
     const ratio = volume / TRUNK_CAPACITY;
 
     let status, statusText, suggestion;
-    const isEmpty = luggage20 === 0 && luggage24 === 0 && luggage28 === 0;
+    const isEmpty = luggage20 === 0 && luggage24 === 0 && luggage28 === 0 && photoLuggage.length === 0;
 
     if (isEmpty) {
       // 未选择行李
       status = STATUS.OK;
       statusText = '后备箱正常可容纳 2件24寸行李箱';
       suggestion = `后备箱容量约${TRUNK_CAPACITY}升`;
-    } else if (ratio <= 0.96) {
+    } else if (ratio <= 0.94) {
       // 能容纳
       status = STATUS.OK;
-      statusText = `后备箱正常可容纳当前选择的行李`;
+      statusText = '后备箱可容纳所有行李';
       suggestion = `已使用${Math.round(ratio * 100)}%，剩余约${Math.round(TRUNK_CAPACITY - volume)}升空间`;
     } else if (ratio <= 1) {
       // 接近满载
@@ -145,7 +226,17 @@ function LuggageChecker() {
     }
 
     return { totalVolume: volume, status, statusText, suggestion, isEmpty };
-  }, [luggage20, luggage24, luggage28]);
+  }, [luggage20, luggage24, luggage28, photoLuggage]);
+
+  // 状态变化时触发动画
+  useEffect(() => {
+    if (prevStatusRef.current !== null && prevStatusRef.current !== status) {
+      setIsStatusChanging(true);
+      const timer = setTimeout(() => setIsStatusChanging(false), 500);
+      return () => clearTimeout(timer);
+    }
+    prevStatusRef.current = status;
+  }, [status]);
 
   // 根据状态获取图标
   const StatusIcon = () => {
@@ -161,14 +252,19 @@ function LuggageChecker() {
 
   // 根据状态获取样式类名
   const getStatusClassName = () => {
+    let className = '';
+    if (isStatusChanging) className += 'status-changing ';
     switch (status) {
       case STATUS.WARNING:
-        return 'status-warning';
+        className += 'status-warning';
+        break;
       case STATUS.ERROR:
-        return 'status-error';
+        className += 'status-error';
+        break;
       default:
-        return '';
+        break;
     }
+    return className.trim();
   };
 
   return (
@@ -239,9 +335,9 @@ function LuggageChecker() {
       {/* Luggage Selector Card */}
       <div className="luggage-card">
         <h2 className="card-title">
-          {luggage20 + luggage24 + luggage28 === 0
+          {luggage20 + luggage24 + luggage28 + photoLuggage.reduce((sum, item) => sum + (item.count || 1), 0) === 0
             ? '选择行李，估算是否能装下'
-            : `已选 ${luggage20 + luggage24 + luggage28}件行李`
+            : `已选 ${luggage20 + luggage24 + luggage28 + photoLuggage.reduce((sum, item) => sum + (item.count || 1), 0)}件行李`
           }
         </h2>
 
@@ -250,7 +346,7 @@ function LuggageChecker() {
           <div className="luggage-item">
             <div className="luggage-image-container">
               <img
-                src="https://www.figma.com/api/mcp/asset/fa0814ec-bcc9-43b1-b0c0-6f35dbe54b4f"
+                src="https://gw.alicdn.com/imgextra/i2/O1CN01rJ2jvc1gdckAytP4Q_!!6000000004165-2-tps-190-187.png"
                 alt="20寸行李箱"
                 className="luggage-image"
               />
@@ -277,7 +373,7 @@ function LuggageChecker() {
           <div className="luggage-item">
             <div className="luggage-image-container">
               <img
-                src="https://www.figma.com/api/mcp/asset/ab740fe3-8668-4517-8c7b-6c665f31b96b"
+                src="https://gw.alicdn.com/imgextra/i3/O1CN01o1QIFt1OlGGSjum5k_!!6000000001745-2-tps-190-187.png"
                 alt="24寸行李箱"
                 className="luggage-image"
               />
@@ -304,7 +400,7 @@ function LuggageChecker() {
           <div className="luggage-item">
             <div className="luggage-image-container">
               <img
-                src="https://www.figma.com/api/mcp/asset/766b64b2-41e6-4a0e-b86b-4fa01ba3f835"
+                src="https://gw.alicdn.com/imgextra/i3/O1CN01XU3FOI1RCOxy6Dfii_!!6000000002075-2-tps-190-187.png"
                 alt="28寸行李箱"
                 className="luggage-image"
               />
@@ -328,8 +424,51 @@ function LuggageChecker() {
           </div>
         </div>
 
+        {/* Photo Luggage List */}
+        {photoLuggage.length > 0 && (
+          <div className="photo-luggage-section">
+            {photoLuggage.map((item, index) => (
+              <div key={index} className="photo-luggage-item">
+                <div className="photo-luggage-photo">
+                  <div className="image-placeholder">
+                    <img src="https://gw.alicdn.com/imgextra/i2/O1CN01DPnk0k1iSkZa6LwLu_!!6000000004412-2-tps-133-117.png" alt="" />
+                  </div>
+                  <img src={item.image} alt="识别的行李" className="image-photo" />
+                  <button
+                    className="icon-close"
+                    onClick={() => {
+                      setPhotoLuggage(prev => prev.filter((_, i) => i !== index));
+                    }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="11" fill="rgba(0,0,0,0.5)"/>
+                      <path d="M8 8L16 16M16 8L8 16" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div className="photo-luggage-size">{item.dimensions}</div>
+                <div className="photo-luggage-counter">
+                  <button
+                    className="counter-btn"
+                    onClick={() => handlePhotoLuggageDecrement(index)}
+                  >
+                    <MinusIcon disabled={false} />
+                  </button>
+                  <span className="counter-value">{item.count}</span>
+                  <button
+                    className="counter-btn"
+                    onClick={() => handlePhotoLuggageIncrement(index)}
+                  >
+                    <PlusIcon />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* AI Photo Feature */}
-        <div className="photo-feature">
+        <div className="photo-feature" onClick={handlePhotoCapture}>
           <div className="photo-feature-left">
             <StarIcon />
             <span className="photo-feature-text">不知道行李尺寸，AI拍照识别</span>

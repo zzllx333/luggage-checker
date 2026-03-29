@@ -1,0 +1,444 @@
+.photo-capture {
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header - 返回按钮区域 */
+.photo-header {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
+}
+
+.photo-header .close-btn {
+  position: absolute;
+  left: 12px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.photo-header .close-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+.photo-header .header-title {
+  display: none;
+}
+
+/* Camera Container - 铺满整个画面 */
+.camera-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.captured-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* 提示文案 - 设计稿居中显示，距离拍照按钮30px间距 */
+.camera-hint {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 145px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 15px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* Capture Section - 拍照按钮 */
+.capture-section {
+  position: absolute;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.capture-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.24);
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 3px;
+}
+
+.capture-btn-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, 0.6) 87.8%);
+  border: 0.5px solid #fff;
+  box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.24);
+}
+
+.capture-btn:active {
+  transform: scale(0.95);
+}
+
+/* Photo Import Button - 右下角相册导入按钮 */
+.photo-import-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 70px;
+  height: 65px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.photo-import-btn img {
+  width: 26px;
+  height: 26px;
+  height: 28px;
+  opacity: 0.9;
+}
+
+/* Scanning Overlay - 扫描动画 */
+.scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 扫描线 - 单条上下移动 */
+.scan-line {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.4);
+  top: 20%;
+  animation: scanMove 2s ease-in-out infinite;
+}
+
+@keyframes scanMove {
+  0%, 100% {
+    top: 20%;
+  }
+  50% {
+    top: 70%;
+  }
+}
+
+/* Recognition Result - 识别结果 */
+.recognition-result {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.result-status {
+  font-size: 13px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.result-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.info-value {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.info-number {
+  font-size: 22px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.info-unit {
+  font-size: 14px;
+  font-weight: 400;
+  color: #fff;
+}
+
+/* 识别完成后的渐变蒙层 */
+.result-gradient-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 200px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Action Buttons - 底部按钮 */
+.action-buttons {
+  position: absolute;
+  bottom: 50px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.action-btn {
+  flex: 1;
+  height: 42px;
+  border-radius: 21px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.retake-action-btn {
+  background: #f7f8fa;
+  color: #5c5f66;
+}
+
+.confirm-action-btn {
+  background: #FFE033;
+  color: #0F131A;
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+/* Error Message */
+.error-message {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 59, 48, 0.9);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 10;
+}
+
+/* Gallery Modal - 模拟图库弹窗 */
+.gallery-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f5f5f5;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  animation: slideUpModal 0.3s ease-out;
+}
+
+@keyframes slideUpModal {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 16px 12px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.gallery-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.gallery-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-close svg {
+  stroke: #000;
+}
+
+.gallery-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  padding: 3px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.gallery-item {
+  aspect-ratio: 1;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  background: #eee;
+  border-radius: 4px;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+.gallery-item:active {
+  opacity: 0.8;
+}
+
+/* Transition Animation - 照片缩小过渡动画 */
+.transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: #000;
+  pointer-events: none;
+}
+
+.transition-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: shrinkToThumbnail 0.4s ease-in-out forwards;
+  border-radius: 0;
+}
+
+@keyframes shrinkToThumbnail {
+  0% {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    opacity: 1;
+  }
+  100% {
+    /* 缩小到缩略图大小，移动到左侧位置 */
+    top: calc(100vh - 180px);
+    left: 12px;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    opacity: 1;
+  }
+}

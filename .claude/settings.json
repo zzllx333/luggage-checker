@@ -2,7 +2,33 @@
   "permissions": {
     "allow": [
       "Bash(git checkout:*)",
-      "Read(//Users/zihui/Desktop/行李图/**)"
+      "Read(//Users/zihui/Desktop/行李图/**)",
+      "mcp__figma__generate_figma_design",
+      "Bash(npm start:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(open \"http://localhost:3000/luggage-checker#figmacapture=41287fa6-933a-4bf4-820b-cd774e5e20bd&figmaendpoint=https%3A%2F%2Fmcp.figma.com%2Fmcp%2Fcapture%2F41287fa6-933a-4bf4-820b-cd774e5e20bd%2Fsubmit&figmadelay=1000\")",
+      "Bash(open \"https://www.figma.com/design/pV2ly2iUn3j3WcAdhzhEw3\")",
+      "Bash(npm search:*)",
+      "WebSearch",
+      "Bash(npx skills:*)",
+      "Bash(curl -s https://api.github.com/repos/anthropics/skills/contents)",
+      "Bash(curl -s https://api.github.com/repos/anthropics/skills/contents/skills)",
+      "Bash(curl -s https://api.github.com/search/repositories?q=slides+skill+claude)",
+      "mcp__figma__get_metadata",
+      "mcp__figma__get_screenshot",
+      "Read(//Users/zihui/.claude/**)",
+      "Bash(npx localtunnel:*)",
+      "Bash(curl -s serveo.net/status)",
+      "Bash(npx surge:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://xingli-app.loca.lt)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://xingli-luggage-app.loca.lt)",
+      "Bash(curl -s http://localhost:49954)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://open-nights-lick.loca.lt)",
+      "Bash(gh auth:*)",
+      "Bash(curl -s https://api.tiiny.host/sites)",
+      "Bash(gh repo:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
