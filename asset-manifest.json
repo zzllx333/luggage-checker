@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/luggage-checker/static/css/main.5c381086.css",
+    "main.js": "/luggage-checker/static/js/main.a58cf107.js",
+    "static/js/453.53c46013.chunk.js": "/luggage-checker/static/js/453.53c46013.chunk.js",
+    "index.html": "/luggage-checker/index.html",
+    "main.5c381086.css.map": "/luggage-checker/static/css/main.5c381086.css.map",
+    "main.a58cf107.js.map": "/luggage-checker/static/js/main.a58cf107.js.map",
+    "453.53c46013.chunk.js.map": "/luggage-checker/static/js/453.53c46013.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5c381086.css",
+    "static/js/main.a58cf107.js"
+  ]
+}
