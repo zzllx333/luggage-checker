@@ -28,7 +28,8 @@
       "Bash(curl -s https://api.tiiny.host/sites)",
       "Bash(gh repo:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
